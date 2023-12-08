@@ -200,6 +200,7 @@ async function initializeConversationViewer() {
         authDiv.innerHTML = `<p><b>${authorRole}</b></p>`;
     }
 
+    // Render \n characters as <br>
     function renderContent(messageId) {
         console.log("renderContent called");
         return getMessage(messageId).message.content.parts.join('').replace(/\n/g, '<br>');
