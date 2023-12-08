@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation Viewer</title>
+    <style>
+        html, body {
+            /* height: 100%; */
+            margin: 0;
+        }
+
+        #sidebar {
+            width: 200px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: 20px;
+            background-color: #f1f1f1;
+        }
+
+        #sidebar > h2 {
+            max-height: 10%;
+        }
+
+        #conversation-list {
+            overflow-y: auto;
+            max-height: 90%;
+        }
+
+        #main-content {
+            margin-left: 220px; /* Adjust margin based on sidebar width */
+            padding: 20px;
+        }
+
+        #conversation-container {
+            margin: 20px;
+            /* margin-left: 240px; */
+        }
+
+        .message-container {
+            margin-bottom: 10px;
+        }
+
+        .arrow-button {
+            cursor: pointer;
+        }
+
+        #sidebar h2 {
+            margin-top: 0;
+        }
+
+        .conversation-link {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <h2>Conversations</h2>
+    <div id="conversation-list"></div>
+</div>
+<div id="main-content">
+    <!-- <button id="start-button" onclick="initializeConversationViewer()">BEGIN</button> -->
+    <div id="conversation-container"></div>
+</div>
+<script src="archive.js"></script>
+</body>
+</html>

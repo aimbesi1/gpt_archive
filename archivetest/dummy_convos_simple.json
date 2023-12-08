@@ -1,0 +1,535 @@
+[
+    {
+        "title": "Test Convo 1",
+        "mapping": {
+            "A": {
+                "id": "A",
+                "message": {
+                    "id": "A",
+                    "author": {
+                        "role": "system"
+                    },
+                    "content": {
+                        "parts": [
+                            ""
+                        ]
+                    }
+                },
+                "parent": "root",
+                "children": [
+                    "B",
+                    "C"
+                ]
+            },
+            "root": {
+                "id": "root",
+                "message": null,
+                "parent": null,
+                "children": [
+                    "A"
+                ]
+            },
+            "B": {
+                "id": "B",
+                "message": {
+                    "id": "B",
+                    "author": {
+                        "role": "user"
+                    },
+                    "content": {
+                        "parts": [
+                            "Test prompt 1-1. Al, I Command You!"
+                        ]
+                    }
+                },
+                "parent": "A",
+                "children": [
+                    "D"
+                ]
+            },
+            "D": {
+                "id": "D",
+                "message": {
+                    "id": "D",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "parts": [
+                            "Response to test prompt 1-1. Yes sir!"
+                        ]
+                    }
+                },
+                "parent": "B",
+                "children": []
+            },
+            "C": {
+                "id": "C",
+                "message": {
+                    "id": "C",
+                    "author": {
+                        "role": "user"
+                    },
+                    "content": {
+                        "parts": [
+                            "Test prompt 1-2. Screw you Al!"
+                        ]
+                    }
+                },
+                "parent": "A",
+                "children": [
+                    "F"
+                ]
+            },
+            "F": {
+                "id": "F",
+                "message": {
+                    "id": "F",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "parts": [
+                            "Response to prompt 1-2. No"
+                        ]
+                    }
+                },
+                "parent": "C",
+                "children": [
+                    "G",
+                    "H"
+                ]
+            },
+            "G": {
+                "id": "G",
+                "message": {
+                    "id": "G",
+                    "author": {
+                        "role": "user"
+                    },
+                    "content": {
+                        "parts": [
+                            "Continuation 1-2-1. You are a sucker Al."
+                        ]
+                    }
+                },
+                "parent": "F",
+                "children": [
+                    "K"
+                ]
+            },
+            "H": {
+                "id": "H",
+                "message": {
+                    "id": "H",
+                    "author": {
+                        "role": "user"
+                    },
+                    "content": {
+                        "parts": [
+                            "Continuation 1-2-2. You are a weird Al."
+                        ]
+                    }
+                },
+                "parent": "F",
+                "children": [
+                    "I",
+                    "J"
+                ]
+            },
+            "I": {
+                "id": "I",
+                "message": {
+                    "id": "I",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "parts": [
+                            "Response 1-2-2-1. I have one thing, and that thing is Bing"
+                        ]
+                    }
+                },
+                "parent": "H",
+                "children": []
+            },
+            "J": {
+                "id": "J",
+                "message": {
+                    "id": "J",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "parts": [
+                            "Response 1-2-2-2. I have one thing, and that thing is Google"
+                        ]
+                    },
+                    "status": "finished_successfully"
+                },
+                "parent": "H",
+                "children": []
+            },
+            "K": {
+                "id": "K",
+                "message": {
+                    "id": "K",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "parts": [
+                            "Response to 1-2-1. As an AL language model,"
+                        ]
+                    }
+                },
+                "parent": "G",
+                "children": []
+            }
+        },
+        "conversation_id": "CONVO-1",
+        "id": "CONVO-1"
+    },
+    {
+        "title": "Test Convo 2",
+        "mapping": {
+            "L": {
+                "id": "L",
+                "message": {
+                    "id": "L",
+                    "author": {
+                        "role": "system"
+                    },
+                    "content": {
+                        "parts": [
+                            ""
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {}
+                },
+                "parent": "root-2",
+                "children": [
+                    "M",
+                    "N",
+                    "O"
+                ]
+            },
+            "root-2": {
+                "id": "root-2",
+                "message": null,
+                "parent": null,
+                "children": [
+                    "L"
+                ]
+            },
+            "M": {
+                "id": "M",
+                "message": {
+                    "id": "M",
+                    "author": {
+                        "role": "user"
+                    },
+                    "content": {
+                        "parts": [
+                            "Test prompt 2-1. Al, I Command You!"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "timestamp_": "absolute",
+                        "message_type": null
+                    }
+                },
+                "parent": "L",
+                "children": [
+                    "P"
+                ]
+            },
+            "N": {
+                "id": "N",
+                "message": {
+                    "id": "N",
+                    "author": {
+                        "role": "user",
+                        "name": null,
+                        "metadata": {}
+                    },
+                    "content": {
+                        "parts": [
+                            "Test prompt 2-2. Al, do as I say!"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "timestamp_": "absolute",
+                        "message_type": null
+                    }
+                },
+                "parent": "L",
+                "children": [
+                    "Q"
+                ]
+            },
+            "O": {
+                "id": "O",
+                "message": {
+                    "id": "O",
+                    "author": {
+                        "role": "user"
+                    },
+                    "content": {
+                        "content_type": "text",
+                        "parts": [
+                            "Test prompt 2-3. Screw you Al!"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "timestamp_": "absolute",
+                        "message_type": null
+                    }
+                },
+                "parent": "L",
+                "children": [
+                    "R"
+                ]
+            },
+            "P": {
+                "id": "P",
+                "message": {
+                    "id": "P",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "parts": [
+                            "Response to test prompt 2-1. Yes sir!"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "finish_details": {
+                            "type": "stop",
+                            "stop_tokens": [
+                                100260
+                            ]
+                        },
+                        "is_complete": true,
+                        "message_type": null,
+                        "model_slug": "text-davinci-002-render-sha",
+                        "parent_id": "M",
+                        "timestamp_": "absolute"
+                    }
+                },
+                "parent": "M",
+                "children": []
+            },
+            "Q": {
+                "id": "Q",
+                "message": {
+                    "id": "Q",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "parts": [
+                            "Response to prompt 2-2. Sorry!"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "finish_details": {
+                            "type": "stop",
+                            "stop_tokens": [
+                                100260
+                            ]
+                        },
+                        "is_complete": true,
+                        "message_type": null,
+                        "model_slug": "text-davinci-002-render-sha",
+                        "parent_id": "N",
+                        "timestamp_": "absolute"
+                    }
+                },
+                "parent": "N",
+                "children": []
+            },
+            "R": {
+                "id": "R",
+                "message": {
+                    "id": "R",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "parts": [
+                            "Response to prompt 2-3. No"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "finish_details": {
+                            "type": "stop",
+                            "stop_tokens": [
+                                100260
+                            ]
+                        },
+                        "is_complete": true,
+                        "message_type": null,
+                        "model_slug": "text-davinci-002-render-sha",
+                        "parent_id": "O",
+                        "timestamp_": "absolute"
+                    }
+                },
+                "parent": "O",
+                "children": [
+                    "S",
+                    "T"
+                ]
+            },
+            "S": {
+                "id": "S",
+                "message": {
+                    "id": "S",
+                    "author": {
+                        "role": "user"
+                    },
+                    "content": {
+                        "parts": [
+                            "Continuation 2-3-1. You are a sucker Al."
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "timestamp_": "absolute",
+                        "message_type": null
+                    }
+                },
+                "parent": "R",
+                "children": [
+                    "U"
+                ]
+            },
+            "T": {
+                "id": "T",
+                "message": {
+                    "id": "T",
+                    "author": {
+                        "role": "user"
+                    },
+                    "content": {
+                        "parts": [
+                            "Continuation 2-3-2. You are a weird Al."
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "timestamp_": "absolute",
+                        "message_type": null
+                    }
+                },
+                "parent": "R",
+                "children": [
+                    "V",
+                    "W"
+                ]
+            },
+            "U": {
+                "id": "U",
+                "message": {
+                    "id": "U",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "content_type": "text",
+                        "parts": [
+                            "Response to 2-3-1. As an AL language model,"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "finish_details": {
+                            "type": "stop",
+                            "stop_tokens": [
+                                100260
+                            ]
+                        },
+                        "is_complete": true,
+                        "message_type": null,
+                        "model_slug": "text-davinci-002-render-sha",
+                        "parent_id": "S",
+                        "timestamp_": "absolute"
+                    }
+                },
+                "parent": "S",
+                "children": []
+            },
+            "V": {
+                "id": "V",
+                "message": {
+                    "id": "V",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "content_type": "text",
+                        "parts": [
+                            "Response 2-3-2-1. I have one thing, and that thing is Bing"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "finish_details": {
+                            "type": "stop",
+                            "stop_tokens": [
+                                100260
+                            ]
+                        },
+                        "is_complete": true,
+                        "message_type": null,
+                        "model_slug": "text-davinci-002-render-sha",
+                        "parent_id": "T",
+                        "timestamp_": "absolute"
+                    }
+                },
+                "parent": "T",
+                "children": []
+            },
+            "W": {
+                "id": "W",
+                "message": {
+                    "id": "W",
+                    "author": {
+                        "role": "assistant"
+                    },
+                    "content": {
+                        "content_type": "text",
+                        "parts": [
+                            "Response 2-3-2-2. I have one thing, and that thing is Google"
+                        ]
+                    },
+                    "status": "finished_successfully",
+                    "metadata": {
+                        "finish_details": {
+                            "type": "stop",
+                            "stop_tokens": [
+                                100260
+                            ]
+                        },
+                        "is_complete": true,
+                        "message_type": null,
+                        "model_slug": "text-davinci-002-render-sha",
+                        "parent_id": "T",
+                        "timestamp_": "absolute"
+                    }
+                },
+                "parent": "T",
+                "children": []
+            }
+        },
+        "conversation_id": "CONVO-2",
+        "id": "CONVO-2"
+    }
+]
