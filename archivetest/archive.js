@@ -7,207 +7,408 @@ async function fetchJSON(url) {
 }
 
 
+function renderConversationList() {
+        
+    console.log(conversationListContainer);
+
+    conversationData.forEach((conversation) => {
+        const conversationLink = document.createElement('div');
+        conversationLink.className = 'conversation-link';
+        conversationLink.innerHTML = conversation.title;
+        conversationLink.addEventListener('click', () => renderConversation(conversation.id));
+        conversationListContainer.appendChild(conversationLink);
+    });
+}
+
+
+
+/*
+    Function to render all the messages on a layer.
+    This works by putting a layer container and children container inside the parentContainer.
+    The layer container contains the author, navigation controls, and message content of the layer.
+    The children container contains all responses to the current message shown on the layer.
+
+    @params
+    messagesArray array of message ids that share the same parent
+    msgId id of the message to display in the message div added to the convo container
+    parentContainer container to put message layer content in
+    childIndexArray the array of remaining child indexes to render, default empty
+*/
+function renderMsgLayer(messagesArray, msgId, parentContainer, childIndexArray = []) {
+    
+    const layerDiv = document.createElement('div')
+    layerDiv.className = 'layer-container';
+
+    const authorDiv = document.createElement('div')
+    authorDiv.className = 'author-container';
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message-container';
+
+    const childDiv = document.createElement('div');
+    childDiv.className = 'children-container';
+
+    const authorRole = getMessage(msgId).message.author.role.toUpperCase();
+    showAuthor(authorDiv, authorRole);
+    showMessage(messageDiv, msgId);
+
+    layerDiv.appendChild(authorDiv);
+    parentContainer.appendChild(layerDiv);
+    parentContainer.appendChild(childDiv);
+
+    let childIndex = childIndexArray.shift();
+    if (childIndex !== undefined && childIndexArray.length === 0) {
+        // Last child selected. Scroll to this element
+        parentContainer.scrollIntoView();
+    }
+    if (childIndex === undefined)
+        childIndex = 0;
+
+    // Create sibling toggle buttons if there's more than one response
+    if (messagesArray.length > 1) {
+        const arrowContainer = document.createElement('div');
+        arrowContainer.className = 'arrow-container';
+        const leftArrow = document.createElement('span');
+        leftArrow.className = 'arrow-button';
+        leftArrow.innerHTML = '←';
+        leftArrow.addEventListener('click', () => nextSibling(-1));
+
+        const messageNumber = document.createElement('span');
+        messageNumber.className = 'message-number';
+        const totalMsgCount = messagesArray.length;
+        var currentMsgIndex = childIndex + 1;
+        messageNumber.innerHTML = `${currentMsgIndex} / ${totalMsgCount}`;
+
+        const inputDiv = document.createElement('span');
+        inputDiv.className = 'quick-input';
+        inputDiv.style = "float: right";
+
+        const inputField = document.createElement('input');
+        inputField.className = 'quick-input-field';
+        inputField.type = 'number';
+        inputField.min = 1;
+        inputField.max = totalMsgCount;
+        inputField.placeholder = `${currentMsgIndex}`;
+
+        inputField.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                selectSibling(parseInt(inputField.value));
+            }
+        });
+
+        const goButton = document.createElement('button');
+        goButton.innerHTML = 'Go';
+        goButton.addEventListener('click', () => selectSibling(parseInt(inputField.value)));
+
+        const rightArrow = document.createElement('span');
+        rightArrow.className = 'arrow-button';
+        rightArrow.innerHTML = '→';
+        rightArrow.addEventListener('click', () => nextSibling(1));
+
+        arrowContainer.appendChild(leftArrow);
+        arrowContainer.appendChild(messageNumber);
+        arrowContainer.appendChild(rightArrow);
+
+        inputDiv.appendChild(inputField);
+        inputDiv.appendChild(goButton);
+        arrowContainer.appendChild(inputDiv);
+        
+        layerDiv.appendChild(arrowContainer);
+
+        // Functionality for arrow buttons
+        function nextSibling(offset) {
+            console.log("currentMsg Index before: " + currentMsgIndex);
+
+            currentMsgIndex = (currentMsgIndex + offset - 1 + totalMsgCount) % totalMsgCount + 1;
+
+            console.log("currentMsg Index after: " + currentMsgIndex);
+
+            selectSibling(currentMsgIndex);
+        }
+
+        // Functionality for quick select
+        function selectSibling(sibNumber) {
+            if (isNaN(sibNumber) || sibNumber < 1 || sibNumber > totalMsgCount) {
+                return;
+            }
+            console.log(sibNumber);
+            currentMsgIndex = sibNumber;
+            messageNumber.innerHTML = `${currentMsgIndex} / ${totalMsgCount}`;
+            inputField.value = currentMsgIndex;
+
+            const nextMsgId = messagesArray[currentMsgIndex - 1];
+           
+            showMessage(messageDiv, nextMsgId);
+            clearChildren(childDiv);
+            renderChildren(nextMsgId, childDiv);
+            msgId = nextMsgId;
+        }
+    }
+    layerDiv.appendChild(messageDiv);
+
+
+    // Render selected children:
+    // let childIndex = 0;
+    // if (!childIndexArray.length === 0)
+    //     childIndex = childIndexArray.shift();
+
+    renderChildren(msgId, childDiv, childIndexArray);
+}
+
+// Remove all the children of the message to be switched out to make room for the children of the message switching in
+function clearChildren(parentContainer) {
+    while (parentContainer.firstChild) {
+        parentContainer.removeChild(parentContainer.firstChild);
+    }
+}
+
+// Recursively render all the children of a given message
+// parent Id: id of the message to render children of
+// parentContainer: container to put parentId's contents and child div in
+function renderChildren(parentId, parentContainer, childIndexArray = []) {
+    // Recursively render children
+    childrenArray = getMessage(parentId).children;
+
+    let childIndex = childIndexArray[0];
+    console.log("child id: " + childrenArray[childIndex]);
+    if (isNaN(childIndex) || childIndex < 0 || childIndex > childrenArray.length) {
+        childIndex = 0;
+    }
+    
+    if (childrenArray.length > 0) {
+        renderMsgLayer(childrenArray, childrenArray[childIndex], parentContainer, childIndexArray);
+    }
+}
+
+// function renderChildren(parentId, parentContainer) {
+//     renderChildren(parentId, parentContainer, 0);
+// }
+
+// Function to render the contents of a conversation
+function renderConversation(conversationId, childIndexArray = []) {
+    conversation = conversationData.find(convo => convo.id === conversationId);
+
+    if (!conversation) {
+        convoContainer.innerHTML = '<p>Conversation not found</p>';
+        return;
+    }
+
+    convoContainer.innerHTML = `<h2>${conversation.title}</h2>`;
+
+    const systemMessageId = findSystemMessageId(conversation.mapping);
+    const systemMsgChildren = getMessage(systemMessageId).children; // array of ids
+    console.log(systemMsgChildren);
+    // Recursively render all messages starting with systemMsg
+    // renderMsgLayer(systemMsgChildren, systemMsgChildren[0], convoContainer, childIndexArray);
+    renderChildren(systemMessageId, convoContainer, childIndexArray)
+}
+
+function getMessage(msgId, convo = conversation) {
+    return convo.mapping[msgId];
+}
+
+// Function to find the ID of the root message
+function findSystemMessageId(mapping) {
+    for (const messageId in mapping) {
+        if (mapping.hasOwnProperty(messageId) && mapping[messageId].message.author.role === "system") {
+            return messageId;
+        }
+    }
+    return null;
+}
+
+// Function to render message content (handling multiple paragraphs)
+function showMessage(msgDiv, msgId) {
+    msgDiv.innerHTML = `<p>${renderContent(msgId)}</p>`;
+}
+
+function showAuthor(authDiv, authorRole) {
+    authDiv.innerHTML = `<p><b>${authorRole}</b></p>`;
+}
+
+function renderContent(messageId, convo = conversation) {
+    console.log("renderContent called");
+    return escapeHTML(getMessage(messageId, convo).message.content.parts.join('')).replace(/\n/g, '<br>');
+}
+
+// Function to escape HTML entities
+function escapeHTML(html) {
+    return html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+// Render the initial conversation
+// renderConversation(conversationData[3].id, [1, 0, 0, 0, 0, 0, 0, 1]);
+
+
+
+/*
+    Function to navigate to a specific message.
+
+    convoId: id of the conversation
+    messageNumberArray: 
+*/
+function goToMessage(convoId, messageNumberArray) {
+    renderConversation(convoId, messageNumberArray);
+
+    // const systemMessageId = findSystemMessageId(conversation.mapping);
+    // const systemMsgChildren = getMessage(systemMessageId).children;
+
+    // for (const id in messageIdArray) {
+    //     renderMsgLayer()
+    // }
+}
+
+
+let convoContainer = document.getElementById('conversation-container');
+let conversationListContainer = document.getElementById('conversation-list');
+let searchButton = document.getElementById("search-button");
+let searchDialog = document.getElementById("search-dialog");
+
+// Fetch and parse your JSON data
+let conversationData = null;
+
+let conversation = null;
+
 // Initialize the conversation viewer
 async function initializeConversationViewer() {
-    const convoContainer = document.getElementById('conversation-container');
-    const conversationListContainer = document.getElementById('conversation-list');
+    convoContainer = document.getElementById('conversation-container');
+    conversationListContainer = document.getElementById('conversation-list');
+    searchButton = document.getElementById("search-button");
+    searchDialog = document.getElementById("search-dialog");
 
     // Fetch and parse your JSON data
-    const conversationData = await fetchJSON('/data');
+    conversationData = await fetchJSON('/data');
 
-    var conversation = null;
+    conversation = null;
 
-    function renderConversationList() {
-        
-        console.log(conversationListContainer);
-    
-        conversationData.forEach((conversation) => {
-            const conversationLink = document.createElement('div');
-            conversationLink.className = 'conversation-link';
-            conversationLink.innerHTML = conversation.title;
-            conversationLink.addEventListener('click', () => renderConversation(conversation.id));
-            conversationListContainer.appendChild(conversationLink);
-        });
-    }
     
 
+    
     renderConversationList();
-
-    // Function to render all the messages on a layer.
-    /*
-        @params
-        messagesArray array of message ids that share the same parent
-        msg id of the message to display in the message div added to the convo container
-    */
-    function renderMsgLayer(messagesArray, msgId, parentContainer) {
-        const layerDiv = document.createElement('div')
-        layerDiv.className = 'layer-container';
-
-        const authorDiv = document.createElement('div')
-        authorDiv.className = 'author-container';
-
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message-container';
-
-        const childDiv = document.createElement('div');
-        childDiv.className = 'children-container';
-
-        const authorRole = getMessage(msgId).message.author.role.toUpperCase();
-        showAuthor(authorDiv, authorRole);
-        showMessage(messageDiv, msgId);
-
-        layerDiv.appendChild(authorDiv);
-        parentContainer.appendChild(layerDiv);
-        parentContainer.appendChild(childDiv);
-
-        
-        if (messagesArray.length > 1) {
-            const arrowContainer = document.createElement('div');
-            arrowContainer.className = 'arrow-container';
-            const leftArrow = document.createElement('span');
-            leftArrow.className = 'arrow-button';
-            leftArrow.innerHTML = '←';
-            leftArrow.addEventListener('click', () => nextSibling(-1));
-
-            const messageNumber = document.createElement('span');
-            messageNumber.className = 'message-number';
-            const totalMsgCount = messagesArray.length;
-            var currentMsgIndex = 1;
-            messageNumber.innerHTML = `${currentMsgIndex} / ${totalMsgCount}`;
-
-            const inputDiv = document.createElement('span');
-            inputDiv.className = 'quick-input';
-            inputDiv.style = "float: right";
-
-            const inputField = document.createElement('input');
-            inputField.className = 'quick-input-field';
-            inputField.type = 'number';
-            inputField.min = 1;
-            inputField.max = totalMsgCount;
-            inputField.placeholder = `${currentMsgIndex}`;
-
-            inputField.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    selectSibling(parseInt(inputField.value));
-                }
-            });
-
-            const goButton = document.createElement('button');
-            goButton.innerHTML = 'Go';
-            goButton.addEventListener('click', () => selectSibling(parseInt(inputField.value)));
-
-            const rightArrow = document.createElement('span');
-            rightArrow.className = 'arrow-button';
-            rightArrow.innerHTML = '→';
-            rightArrow.addEventListener('click', () => nextSibling(1));
-
-            arrowContainer.appendChild(leftArrow);
-            arrowContainer.appendChild(messageNumber);
-            arrowContainer.appendChild(rightArrow);
-
-            inputDiv.appendChild(inputField);
-            inputDiv.appendChild(goButton);
-            arrowContainer.appendChild(inputDiv);
-            
-            layerDiv.appendChild(arrowContainer);
-
-            function nextSibling(offset) {
-                console.log("currentMsg Index before: " + currentMsgIndex);
-
-                currentMsgIndex = (currentMsgIndex + offset - 1 + totalMsgCount) % totalMsgCount + 1;
-
-                console.log("currentMsg Index after: " + currentMsgIndex);
-
-                selectSibling(currentMsgIndex);
-            }
-
-            function selectSibling(sibNumber) {
-                if (isNaN(sibNumber) || sibNumber < 1 || sibNumber > totalMsgCount) {
-                    return;
-                }
-                console.log(sibNumber);
-                currentMsgIndex = sibNumber;
-                messageNumber.innerHTML = `${currentMsgIndex} / ${totalMsgCount}`;
-                inputField.value = currentMsgIndex;
-
-                const nextMsgId = messagesArray[currentMsgIndex - 1];
-               
-                showMessage(messageDiv, msgId);
-                clearChildren(childDiv);
-                renderChildren(nextMsgId, childDiv);
-                msgId = nextMsgId;
-            }
-        }
-        layerDiv.appendChild(messageDiv);
-
-        renderChildren(msgId, childDiv);
-    }
-
-    function clearChildren(parentContainer) {
-        while (parentContainer.firstChild) {
-            parentContainer.removeChild(parentContainer.firstChild);
-        }
-    }
-
-    function renderChildren(parentId, parentContainer) {
-        // Recursively render children
-        childrenArray = getMessage(parentId).children;
-
-        if (childrenArray.length > 0) {
-            renderMsgLayer(childrenArray, childrenArray[0], parentContainer);
-        }
-    }
-
-    // Function to render the contents of a conversation
-    function renderConversation(conversationId) {
-        conversation = conversationData.find(convo => convo.id === conversationId);
-
-        if (!conversation) {
-            convoContainer.innerHTML = '<p>Conversation not found</p>';
-            return;
-        }
-
-        convoContainer.innerHTML = `<h2>${conversation.title}</h2>`;
-
-        const systemMessageId = findSystemMessageId(conversation.mapping);
-        const systemMsgChildren = getMessage(systemMessageId).children; // array of ids
-        console.log(systemMsgChildren);
-        // Recursively render all messages starting with systemMsg
-        renderMsgLayer(systemMsgChildren, systemMsgChildren[0], convoContainer);
-    }
-
-    function getMessage(msgId) {
-        return conversation.mapping[msgId];
-    }
-
-    // Function to find the ID of the root message
-    function findSystemMessageId(mapping) {
-        for (const messageId in mapping) {
-            if (mapping.hasOwnProperty(messageId) && mapping[messageId].message.author.role === "system") {
-                return messageId;
-            }
-        }
-        return null;
-    }
-
-    // Function to render message content (handling multiple paragraphs)
-    function showMessage(msgDiv, msgId) {
-        msgDiv.innerHTML = `<p>${renderContent(msgId)}</p>`;
-    }
-
-    function showAuthor(authDiv, authorRole) {
-        authDiv.innerHTML = `<p><b>${authorRole}</b></p>`;
-    }
-
-    // Render \n characters as <br>
-    function renderContent(messageId) {
-        console.log("renderContent called");
-        return getMessage(messageId).message.content.parts.join('').replace(/\n/g, '<br>');
-    }
-
-    // Render the initial conversation
     renderConversation(conversationData[0].id);
+    setupSearch();
 }
+
+function setupSearch() {
+    searchButton.addEventListener("click", () => {
+        document.getElementById("search-background").style.display = "block";
+        searchDialog.style.display = "block";
+    });
+    document.getElementById("search-background").addEventListener("click", () => {
+        closeSearchDialog();
+    });
+}
+
+function closeSearchDialog() {
+    searchDialog.style.display = "none";
+    document.getElementById("search-background").style.display = "none";
+}
+
+function searchMessages() {
+    searchString = document.getElementById("search-input").value.toLowerCase();
+    // Implement your search logic here
+    // Update the conversation list and main content based on the search results
+    const results = [];
+
+    for (const convo of conversationData) {
+        const convoId = convo.id;
+        const systemMessageId = findSystemMessageId(convo.mapping);
+
+        const findMessages = (messageId, parentIds, messageIndex, parentIndexes, conversationId) => {
+            const message = convo.mapping[messageId].message;
+            // const messageIds = [...parentIds, messageId]
+            // let parentMsg = convo.mapping[parentIds[parentIds.length - 1]]
+            // let messageIndex = convo.mapping[parentIds[parentIds.length - 1]].children.indexOf(messageId);
+
+
+            if (message && message.content.parts.some(part => part.toLowerCase().includes(searchString))) {
+                console.log(message.id);
+                // let messageIds = [...parentIds, messageId];
+                // let messageIndexes = [...parentIndexes];
+                // if (messageId === systemMessageId) {
+                //     messageIndexes.push(0);
+                // }
+                // else {
+                //     messageIndexes.push(convo.mapping[parentIds[parentIds.length - 1]].children.indexOf(messageId));
+                // }
+                results.push({
+                    convo_id: conversationId,
+                    message_ids: [...parentIds, messageId],
+                    message_indexes: [...parentIndexes, messageIndex],
+                    title: convo.title,
+                    contents: "" + getExcerpt(renderContent(message.id, convo), document.getElementById("search-input").value),
+                    role: message.author.role,
+                });
+            }
+
+            const children = convo.mapping[messageId].children;
+            for (let i = 0; i < children.length; i++) {
+                findMessages(children[i], [...parentIds, messageId], i, [...parentIndexes, messageIndex], conversationId);
+            }
+        };
+
+        findMessages(systemMessageId, [], 0, [], convoId);
+    }
+
+    displayResults(results);
+    // Close the search dialog
+}
+
+function displayResults(results) {
+    const resultsDiv = document.getElementById("results-list");
+    resultsDiv.innerHTML = "";
+
+    if (results.length === 0) {
+        resultsDiv.textContent = "No matching messages found.";
+    } 
+    else {
+        for (const result of results) {
+            const path = result.message_indexes;
+            path.shift();
+            const resultDiv = document.createElement("div");
+            resultDiv.id = "result-entry";
+            resultDiv.innerHTML = `
+                <p>Conversation: ${result.title}</p>
+                <p>Message Path: ${path.join(", ")}</p>
+                <p>Contents: ${result.contents}</p>
+                <hr>
+            `;
+            resultDiv.addEventListener("click", () => {
+                console.log(path);
+                renderConversation(result.convo_id, [...path]);
+                closeSearchDialog();
+                console.log(path);
+            });
+            resultsDiv.appendChild(resultDiv);
+        }
+    }
+}
+
+function getExcerpt(mainString, substring, excerptLength = 300) {
+    const index = mainString.toLowerCase().indexOf(substring.toLowerCase());
+
+    if (index !== -1) {
+        const start = Math.max(0, index - Math.floor(excerptLength / 2));
+        const end = Math.min(mainString.length, start + excerptLength);
+
+        let excerpt = mainString.substring(start, end);
+
+        // Add ellipsis (...) if the excerpt does not start at the beginning
+
+        if (start > 0) {
+            excerpt = `... ${excerpt}`;
+        }
+
+        if (end < mainString.length) {
+            excerpt = excerpt + "...";
+        }
+
+        return excerpt;
+    }
+
+    return `Substring ${substring} not found somehow`;
+}
+
+    
 
 window.onload = initializeConversationViewer();
